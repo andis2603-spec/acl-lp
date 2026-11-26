@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Creator Labs — Portal Pembelajaran AI No #1 di Indonesia</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================
+           RESET & BASIC SETUP
+           ========================================== */
+        :root {
+            --bg-dark: #07070d;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-glass: rgba(18, 16, 35, 0.55);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(139, 92, 246, 0.3);
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --font-serif: 'Instrument Serif', Georgia, serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* ==========================================
+           BACKGROUND & LIGHT PARTICLES
+           ========================================== */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.25;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .glow-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #6366f1, #3b82f6);
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .glow-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #8b5cf6, #ec4899);
+            bottom: 10%;
+            right: -100px;
+        }
+        .glow-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #06b6d4, #3b82f6);
+            bottom: 20%;
+            left: -100px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+        }
+
+        /* ==========================================
+           HEADER / NAVBAR
+           ========================================== */
+        header {
+            padding: 24px 0;
+            display: flex;
+            justify: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .logo-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .logo-text {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-portal-home {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-portal-home:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ==========================================
+           HERO SECTION
+           ========================================== */
+        .hero-section {
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+
+        .portal-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--border-highlight);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: #a78bfa;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .portal-label span.dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #a78bfa;
+            box-shadow: 0 0 8px #a78bfa;
+        }
+
+        .hero-headline {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 6vw, 4.2rem);
+            line-height: 1.1;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+        }
+
+        .hero-headline em {
+            font-style: italic;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-headline .sub-heading-badge {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: clamp(1.2rem, 3.5vw, 2.2rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .hero-subheadline {
+            max-width: 680px;
+            margin: 0 auto 36px;
+            font-size: 16px;
+            color: var(--text-muted);
+            font-weight: 400;
+            line-height: 1.7;
+        }
+
+        /* Nav Tab Horizontal */
+        .portal-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 4px;
+            max-width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .nav-tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 4px;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-tab-btn:hover {
+            color: #ffffff;
+        }
+
+        .nav-tab-btn.active {
+            color: #ffffff;
+        }
+
+        .nav-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+            border-radius: 2px;
+        }
+
+        /* Shortcut Capsule Pills */
+        .shortcut-capsules {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        .capsule-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .capsule-btn:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            background: rgba(139, 92, 246, 0.1);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Chat-style Input Bar */
+        .chat-input-wrapper {
+            max-width: 620px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chat-input-box {
+            width: 100%;
+            background: rgba(15, 15, 26, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 16px 54px 16px 20px;
+            border-radius: 16px;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-input-box:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.25);
+        }
+
+        .chat-submit-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s ease;
+        }
+
+        .chat-submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* ==========================================
+           DYNAMIC VIEW CONTAINER (PAGES)
+           ========================================== */
+        .view-section {
+            display: none;
+            padding: 30px 0 80px;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .view-section.active-view {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* --- 1. HOME / OVERVIEW VIEW --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .feature-card {
+            padding: 28px;
+            border-radius: 16px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-500);
+            border-color: var(--border-highlight);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(139, 92, 246, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #a78bfa;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+
+        .feature-card ul li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 18px;
+        }
+
+        .feature-card ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-purple);
+            font-weight: bold;
+        }
+
+        /* Target Audience Section */
+        .audience-section {
+            padding: 36px;
+            border-radius: 20px;
+            margin-bottom: 48px;
+        }
+
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        .audience-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #e5e7eb;
+        }
+
+        .audience-item span.icon {
+            color: #10b981;
+        }
+
+        /* Testimonials Section */
+        .testi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .testi-card {
+            padding: 24px;
+            border-radius: 16px;
+            font-style: italic;
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        .testi-author {
+            margin-top: 16px;
+            font-style: normal;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a78bfa;
+        }
+
+        /* CTA Box */
+        .cta-box {
+            text-align: center;
+            padding: 48px 24px;
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.12), rgba(15, 15, 26, 0.6));
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            margin-top: 40px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.6);
+        }
+
+        /* --- 2. RESOURCES VIEW (Card Grid) --- */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 24px;
+        }
+
+        .res-card {
+            padding: 24px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .res-card:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-4px);
+        }
+
+        .res-badge {
+            align-self: flex-start;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+
+        .res-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .res-desc {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .res-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a78bfa;
+            text-decoration: none;
+            transition: gap 0.2s ease;
+        }
+
+        .res-link:hover {
+            gap: 10px;
+            color: #c4b5fd;
+        }
+
+        /* --- 3. KNOWLEDGES VIEW (Video Library) --- */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .video-card {
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .video-card:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-4px);
+        }
+
+        .video-thumb {
+            width: 100%;
+            height: 170px;
+            background: rgba(255, 255, 255, 0.05);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .play-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .video-card:hover .play-icon {
+            transform: scale(1.1);
+            background: var(--accent-purple);
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .video-info {
+            padding: 18px;
+        }
+
+        .video-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .video-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* --- 4. ARTICLES VIEW (Filtered Articles) --- */
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .tag-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag-btn.active, .tag-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: var(--accent-purple);
+            color: #fff;
+        }
+
+        .articles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .article-item {
+            padding: 20px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .article-item:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+
+        .article-content {
+            max-width: 80%;
+        }
+
+        .article-tag-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #06b6d4;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .article-title-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .article-snippet {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .article-arrow {
+            color: var(--text-muted);
+            font-size: 18px;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .article-item:hover .article-arrow {
+            color: #a78bfa;
+            transform: translateX(4px);
+        }
+
+        /* ==========================================
+           FOOTER
+           ========================================== */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px 0;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        footer p {
+            margin-bottom: 8px;
+        }
+
+        /* ==========================================
+           RESPONSIVE BREAKPOINTS
+           ========================================== */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 40px 0 30px;
+            }
+            .portal-nav {
+                gap: 16px;
+            }
+            .nav-tab-btn {
+                font-size: 11px;
+                padding: 8px 2px;
+            }
+            .capsule-btn {
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+            .article-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .article-content {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Animation Canvas -->
+    <canvas id="particle-canvas"></canvas>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <div class="container">
+        <!-- Header Nav -->
+        <header>
+            <a href="#" class="logo-area" onclick="switchTab('home')">
+                <div class="logo-badge">AI</div>
+                <div class="logo-text">AI CREATOR LABS</div>
+            </a>
+            <button class="btn-portal-home" onclick="switchTab('home')">Beranda Portal</button>
+        </header>
+
+        <!-- Main Hero Section -->
+        <section class="hero-section">
+            <div class="portal-label">
+                <span class="dot"></span>
+                PORTAL PEMBELAJARAN AI
+            </div>
+
+            <h1 class="hero-headline">
+                TEMPAT BELAJAR <em>AI</em>
+                <span class="highlight-subtext">NO #1 DI INDONESIA</span>
+            </h1>
+
+            <p class="hero-subheadline">
+                Kuasai pembuatan Content Creation, AI Agent, dan tingkatkan produktivitas bisnis dengan AI tanpa ribet coding.
+            </p>
+
+            <!-- Navigation Tabs -->
+            <div class="portal-nav">
+                <button class="nav-tab-btn active" id="tab-home" onclick="switchTab('home')">OVERVIEW</button>
+                <button class="nav-tab-btn" id="tab-resources" onclick="switchTab('resources')">RESOURCES</button>
+                <button class="nav-tab-btn" id="tab-knowledges" onclick="switchTab('knowledges')">KNOWLEDGES</button>
+                <button class="nav-tab-btn" id="tab-articles" onclick="switchTab('articles')">ARTICLES</button>
+            </div>
+
+            <!-- Shortcut Capsules -->
+            <div class="shortcut-capsules">
+                <button class="capsule-btn" onclick="switchTab('resources')">⚡ Prompt Engineering</button>
+                <button class="capsule-btn" onclick="switchTab('resources')">🤖 Build AI Agent</button>
+                <button class="capsule-btn" onclick="switchTab('knowledges')">🎬 Video Automation</button>
+                <button class="capsule-btn" onclick="switchTab('articles')">📈 Business Growth</button>
+                <button class="capsule-btn" onclick="switchTab('knowledges')">💡 Personal Branding</button>
+            </div>
+
+            <!-- Chat-Style Input Bar -->
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input-box" id="user-query" placeholder="Tanyakan topik AI atau cari materi yang ingin dipelajari..." onkeypress="handleSearch(event)">
+                <button class="chat-submit-btn" onclick="triggerSearch()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 1: HOME / OVERVIEW
+             ========================================== -->
+        <main id="view-home" class="view-section active-view">
+            <div class="features-grid">
+                <div class="glass-panel feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>1. AI Content Creator</h3>
+                    <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Belajar membuat berbagai jenis konten dengan bantuan AI.</p>
+                    <ul>
+                        <li>Tools AI untuk kebutuhan konten</li>
+                        <li>Teknik membuat prompt efektif</li>
+                        <li>Ide konten media sosial & caption</li>
+                        <li>Membuat gambar, desain & video AI</li>
+                        <li>Konten IG, TikTok, FB & YouTube</li>
+                        <li>Strategi personal branding & jualan</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>2. AI Agent Builder</h3>
+                    <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Mengenal & membangun teknologi AI Agent modern.</p>
+                    <ul>
+                        <li>Cara kerja AI Agent vs AI Chatbot</li>
+                        <li>Membuat AI Agent dari dasar tanpa coding</li>
+                        <li>Tools & workflow instruksi AI Agent</li>
+                        <li>Otomatisasi pekerjaan rutin & bisnis</li>
+                        <li>Meningkatkan efisiensi kerja 10x lipat</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>3. AI Productivity & Business</h3>
+                    <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Manfaatkan AI untuk aktivitas kerja sehari-hari.</p>
+                    <ul>
+                        <li>Riset ide bisnis & strategi pemasaran</li>
+                        <li>Materi promosi kilat hemat waktu</li>
+                        <li>Bantuan otomatisasi tugas administratif</li>
+                        <li>Peluang baru layanan berbasis AI</li>
+                        <li>Pengembangan produk & ekosistem bisnis</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Target Audience -->
+            <div class="glass-panel audience-section">
+                <div class="section-header-title">👥 Siapa Yang Cocok Ikut Program Ini?</div>
+                <p class="section-desc">Bahkan jika kamu belum pernah menggunakan AI sekalipun, kamu tetap bisa belajar di sini dari nol!</p>
+                <div class="audience-grid">
+                    <div class="audience-item"><span class="icon">✓</span> Pemula belajar AI dari nol</div>
+                    <div class="audience-item"><span class="icon">✓</span> Pelaku UMKM & Pemilik Bisnis</div>
+                    <div class="audience-item"><span class="icon">✓</span> Content Creator & Copywriter</div>
+                    <div class="audience-item"><span class="icon">✓</span> Affiliate Marketer</div>
+                    <div class="audience-item"><span class="icon">✓</span> Digital Marketer & Freelancer</div>
+                    <div class="audience-item"><span class="icon">✓</span> Karyawan & Mahasiswa</div>
+                </div>
+            </div>
+
+            <!-- Testimonials -->
+            <div style="margin-bottom: 40px;">
+                <div class="section-header-title">⭐ Apa Kata Mereka?</div>
+                <div class="testi-grid">
+                    <div class="glass-panel testi-card">
+                        "Materi sangat mudah dipahami. Sekarang buat ide konten seminggu cukup selesai dalam waktu 30 menit pakai AI!"
+                        <div class="testi-author">— Peserta Content Creator</div>
+                    </div>
+                    <div class="glass-panel testi-card">
+                        "Berhasil bikin AI Agent pertama yang bantu rekap admin otomatis. Sangat membantu produktivitas usaha saya."
+                        <div class="testi-author">— Peserta Agent Builder</div>
+                    </div>
+                    <div class="glass-panel testi-card">
+                        "Tidak menyangka belajar AI tanpa coding semudah ini. Benar-benar dibimbing dari nol sampai paham."
+                        <div class="testi-author">— Peserta UMKM</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Box -->
+            <div class="cta-box">
+                <h2 style="font-family: var(--font-serif); font-size: 32px; font-weight: 400; margin-bottom: 12px;">Mulai Perjalanan AI-Mu Hari Ini!</h2>
+                <p style="color: var(--text-muted); max-width: 540px; margin: 0 auto; font-size: 14.5px;">
+                    Tidak perlu menunggu sampai ahli. Pelajari satu skill baru, praktikkkan, dan kembangkan kemampuanmu sekarang.
+                </p>
+                <button class="btn-primary" onclick="alert('Selamat datang! Pendaftaran kelas AI Creator Labs dibuka. Silakan pilih menu materi di navigasi atas.')">KLIK TOMBOL DAFTAR SEKARANG</button>
+            </div>
+        </main>
+
+        <!-- ==========================================
+             VIEW 2: RESOURCES (Skill Matrix Grid)
+             ========================================== -->
+        <main id="view-resources" class="view-section">
+            <div class="section-header-title">🛠️ Resources & Skill Library</div>
+            <p class="section-desc">Kumpulan modul panduan, prompt framework, dan skill matrix untuk mengakselerasi kemampuan AI kamu. (Acuan: skills structure)</p>
+
+            <div class="resources-grid">
+                <div class="glass-panel res-card">
+                    <div>
+                        <div class="res-badge">Prompting</div>
+                        <h4 class="res-title">Master Prompt Engineering Framework</h4>
+                        <p class="res-desc">Formula menyusun prompt presisi tinggi untuk ChatGPT & Claude demi hasil copy dan riset tanpa cela.</p>
+                    </div>
+                    <a href="https://www.aihero.dev/skills" target="_blank" class="res-link">Buka Skills Reference ↗</a>
+                </div>
+
+                <div class="glass-panel res-card">
+                    <div>
+                        <div class="res-badge">AI Agent</div>
+                        <h4 class="res-title">Zero-Code Agent Starter Pack</h4>
+                        <p class="res-desc">Panduan memilih tools AI Agent (n8n, Make, Flowise) dan menyusun workflow instruksi otomatis.</p>
+                    </div>
+                    <a href="https://www.aihero.dev/skills" target="_blank" class="res-link">Buka Skills Reference ↗</a>
+                </div>
+
+                <div class="glass-panel res-card">
+                    <div>
+                        <div class="res-badge">Design & Visual</div>
+                        <h4 class="res-title">Midjourney & Stable Diffusion Blueprint</h4>
+                        <p class="res-desc">Kumpulan keyword visual untuk menghasilkan foto produk, karakter, dan materi branding eksklusif.</p>
+                    </div>
+                    <a href="https://www.aihero.dev/skills" target="_blank" class="res-link">Buka Skills Reference ↗</a>
+                </div>
+
+                <div class="glass-panel res-card">
+                    <div>
+                        <div class="res-badge">Video AI</div>
+                        <h4 class="res-title">AI Video Generation Workflow</h4>
+                        <p class="res-desc">Langkah praktis membuat avatar AI dan video promosi otomatis tanpa perlu tampil di depan kamera.</p>
+                    </div>
+                    <a href="https://www.aihero.dev/skills" target="_blank" class="res-link">Buka Skills Reference ↗</a>
+                </div>
+
+                <div class="glass-panel res-card">
+                    <div>
+                        <div class="res-badge">Copywriting</div>
+                        <h4 class="res-title">High-Converting Copy Prompts</h4>
+                        <p class="res-desc">Template pemicu copywriting penjualan, caption IG/TikTok, dan script iklan dalam hitungan detik.</p>
+                    </div>
+                    <a href="https://www.aihero.dev/skills" target="_blank" class="res-link">Buka Skills Reference ↗</a>
+                </div>
+
+                <div class="glass-panel res-card">
+                    <div>
+                        <div class="res-badge">Productivity</div>
+                        <h4 class="res-title">Business Automation Checklist</h4>
+                        <p class="res-desc">Checklist integrasi AI ke tugas administratif harian untuk menghemat hingga 15 jam per minggu.</p>
+                    </div>
+                    <a href="https://www.aihero.dev/skills" target="_blank" class="res-link">Buka Skills Reference ↗</a>
+                </div>
+            </div>
+        </main>
+
+        <!-- ==========================================
+             VIEW 3: KNOWLEDGES (Video Library)
+             ========================================== -->
+        <main id="view-knowledges" class="view-section">
+            <div class="section-header-title">📺 Knowledges Video Library</div>
+            <p class="section-desc">Pustaka materi video pembelajaran interaktif langkah demi langkah. (Acuan: videos structure)</p>
+
+            <div class="videos-grid">
+                <div class="glass-panel video-card">
+                    <div class="video-thumb" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80');">
+                        <div class="play-icon">▶</div>
+                        <div class="video-duration">14:20</div>
+                    </div>
+                    <div class="video-info">
+                        <h4 class="video-title">Pengenalan Dasar AI & Ekosistem Tools Modern 2026</h4>
+                        <div class="video-meta">AI Basics • 1.2k views</div>
+                        <a href="https://www.aihero.dev/videos" target="_blank" class="res-link" style="margin-top:10px;">Tonton di Video Library ↗</a>
+                    </div>
+                </div>
+
+                <div class="glass-panel video-card">
+                    <div class="video-thumb" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=600&q=80');">
+                        <div class="play-icon">▶</div>
+                        <div class="video-duration">22:45</div>
+                    </div>
+                    <div class="video-info">
+                        <h4 class="video-title">Cara Bikin AI Agent Pertama Tanpa Coding Dari Nol</h4>
+                        <div class="video-meta">AI Agent • 3.4k views</div>
+                        <a href="https://www.aihero.dev/videos" target="_blank" class="res-link" style="margin-top:10px;">Tonton di Video Library ↗</a>
+                    </div>
+                </div>
+
+                <div class="glass-panel video-card">
+                    <div class="video-thumb" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=600&q=80');">
+                        <div class="play-icon">▶</div>
+                        <div class="video-duration">18:10</div>
+                    </div>
+                    <div class="video-info">
+                        <h4 class="video-title">Strategi Konten Otomatis untuk Instagram & TikTok</h4>
+                        <div class="video-meta">Content Creator • 2.8k views</div>
+                        <a href="https://www.aihero.dev/videos" target="_blank" class="res-link" style="margin-top:10px;">Tonton di Video Library ↗</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ==========================================
+             VIEW 4: ARTICLES (Tagged Articles)
+             ========================================== -->
+        <main id="view-articles" class="view-section">
+            <div class="section-header-title">📚 Articles & Topic Guides</div>
+            <p class="section-desc">Pilih tag/topik untuk membaca wawasan mendalam seputar kecerdasan buatan. (Acuan: creatorscience structure)</p>
+
+            <!-- Filter Tags -->
+            <div class="filter-tags">
+                <button class="tag-btn active" onclick="filterArticles('all', this)">Semua Tag</button>
+                <button class="tag-btn" onclick="filterArticles('agent', this)">AI Agent</button>
+                <button class="tag-btn" onclick="filterArticles('content', this)">Content Strategy</button>
+                <button class="tag-btn" onclick="filterArticles('business', this)">Business & Productivity</button>
+            </div>
+
+            <!-- Articles List -->
+            <div class="articles-list">
+                <a href="https://creatorscience.com" target="_blank" class="glass-panel article-item" data-tag="agent">
+                    <div class="article-content">
+                        <div class="article-tag-label">AI Agent</div>
+                        <div class="article-title-text">Perbedaan Mendasar AI Chatbot Biasa vs Autonomous AI Agent</div>
+                        <div class="article-snippet">Pelajari kenapa AI Agent adalah lompatan teknologi yang akan menggantikan tugas eksekusi berulang di bisnis Anda.</div>
+                    </div>
+                    <div class="article-arrow">→</div>
+                </a>
+
+                <a href="https://creatorscience.com" target="_blank" class="glass-panel article-item" data-tag="content">
+                    <div class="article-content">
+                        <div class="article-tag-label">Content Strategy</div>
+                        <div class="article-title-text">Cara Membangun Personal Branding Konsisten Menggunakan Bantuan AI</div>
+                        <div class="article-snippet">Panduan mengolah ide, menyusun kalender editorial, dan mempertahankan ciri khas konten tanpa rasa lelah.</div>
+                    </div>
+                    <div class="article-arrow">→</div>
+                </a>
+
+                <a href="https://creatorscience.com" target="_blank" class="glass-panel article-item" data-tag="business">
+                    <div class="article-content">
+                        <div class="article-tag-label">Business & Productivity</div>
+                        <div class="article-title-text">Peluang Bisnis Berbasis AI untuk Pemula dan UMKM di Indonesia</div>
+                        <div class="article-snippet">Bagaimana memanfaatkan tools AI yang ada untuk membuka jasa layanan baru atau mempercepat skala bisnis.</div>
+                    </div>
+                    <div class="article-arrow">→</div>
+                </a>
+
+                <a href="https://creatorscience.com" target="_blank" class="glass-panel article-item" data-tag="content">
+                    <div class="article-content">
+                        <div class="article-tag-label">Content Strategy</div>
+                        <div class="article-title-text">Rahasia Menulis Prompt Visual untuk Desain Iklan Berkonversi Tinggi</div>
+                        <div class="article-snippet">Teknik sederhana menentukan pencahayaan, gaya gambar, dan komposisi visual AI untuk promosi online.</div>
+                    </div>
+                    <div class="article-arrow">→</div>
+                </a>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2026 <strong>AI Creator Labs</strong>. Hak Cipta Dilindungi.</p>
+            <p style="font-size: 12px; opacity: 0.7;">Portal Belajar AI & Agent Builder Terdepan di Indonesia.</p>
+        </footer>
+    </div>
+
+    <!-- ==========================================
+         JAVASCRIPT
+         ========================================== -->
+    <script>
+        // 1. Tab Switching Functionality
+        function switchTab(tabName) {
+            // Update active state in nav buttons
+            const tabs = ['home', 'resources', 'knowledges', 'articles'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const view = document.getElementById(`view-${t}`);
+                if (btn) btn.classList.remove('active');
+                if (view) view.classList.remove('active-view');
+            });
+
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            const activeView = document.getElementById(`view-${tabName}`);
+            
+            if (activeBtn) activeBtn.classList.add('active');
+            if (activeView) activeView.classList.add('active-view');
+
+            // Scroll smoothly to navigation area if low on screen
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 2. Articles Tag Filtering
+        function filterArticles(tag, btnElement) {
+            // Update active button tag
+            const buttons = document.querySelectorAll('.filter-tags .tag-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            // Filter items
+            const articles = document.querySelectorAll('.articles-list .article-item');
+            articles.forEach(art => {
+                if (tag === 'all' || art.getAttribute('data-tag') === tag) {
+                    art.style.display = 'flex';
+                } else {
+                    art.style.display = 'none';
+                }
+            });
+        }
+
+        // 3. Simple Search Response
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                triggerSearch();
+            }
+        }
+
+        function triggerSearch() {
+            const query = document.getElementById('user-query').value.trim();
+            if (!query) return;
+
+            // Direct search query to corresponding views
+            const q = query.toLowerCase();
+            if (q.includes('video') || q.includes('tonton') || q.includes('youtube')) {
+                switchTab('knowledges');
+            } else if (q.includes('artikel') || q.includes('baca') || q.includes('tag')) {
+                switchTab('articles');
+            } else {
+                switchTab('resources');
+            }
+        }
+
+        // 4. Ambient Particle Canvas Animation
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const particles = [];
+        const numParticles = 45;
+
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 2 + 0.5,
+                color: `rgba(${160 + Math.random() * 60}, ${130 + Math.random() * 80}, 255, ${Math.random() * 0.4 + 0.1})`,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3
+            });
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+    </script>
+</body>
+</html>
