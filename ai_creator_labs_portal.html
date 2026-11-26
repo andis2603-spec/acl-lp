@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Creator Labs — Portal Belajar Eksklusif</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Instrument Serif', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f3ff',
+              100: '#e1e7fe',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              900: '#1e1b4b',
+              glow: '#805ad5'
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 8s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Glassmorphism Styles */
+    body {
+      background-color: #070913;
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+    
+    .glass-card {
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 20px rgba(99, 102, 241, 0.05);
+    }
+    
+    .glass-card-interactive {
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .glass-card-interactive:hover {
+      background: rgba(30, 41, 59, 0.65);
+      border-color: rgba(129, 140, 248, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(99, 102, 241, 0.15);
+    }
+
+    .glass-input {
+      background: rgba(10, 15, 30, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    
+    .glass-input:focus-within {
+      border-color: rgba(129, 140, 248, 0.5);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .nav-tab-active {
+      color: #ffffff;
+      position: relative;
+    }
+    
+    .nav-tab-active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #818cf8, #c084fc);
+      border-radius: 9999px;
+      box-shadow: 0 0 8px rgba(192, 132, 252, 0.8);
+    }
+
+    /* Ambient Glow Blobs */
+    .glow-blob-1 {
+      position: absolute;
+      top: -10%;
+      left: 20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(79, 70, 229, 0.18) 0%, rgba(147, 51, 234, 0.08) 50%, rgba(0,0,0,0) 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .glow-blob-2 {
+      position: absolute;
+      top: 40%;
+      right: -10%;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.05) 50%, rgba(0,0,0,0) 70%);
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070913;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    .view-pane {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+    
+    .view-pane.active {
+      display: block;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen relative font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- HTML5 Background Particle Canvas -->
+  <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+  
+  <!-- Ambient Blurred Glow Elements -->
+  <div class="glow-blob-1"></div>
+  <div class="glow-blob-2"></div>
+
+  <!-- Main Portal Shell Container -->
+  <div class="relative z-10 flex flex-col min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Top Header & Navigation -->
+    <header class="pt-8 pb-6 flex flex-col items-center text-center">
+      
+      <!-- Top Small Pill Label -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-card text-xs font-semibold tracking-wider text-indigo-300 border border-indigo-500/20 mb-6 uppercase shadow-inner">
+        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+        Portal Belajar AI Creator Labs
+      </div>
+
+      <!-- Main Title (Serif with Italic Accent) -->
+      <h1 class="font-serif text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-white max-w-4xl leading-[1.15] mb-6">
+        Dari Nol Jadi <span class="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">AI Creator</span> & AI Agent Builder
+      </h1>
+
+      <p class="text-slate-400 text-sm sm:text-base max-w-2xl mb-8 leading-relaxed font-light">
+        Pintu masuk ke ruang belajar eksklusif. Kuasai pembuatan konten otomatis, rakit AI Agent cerdas, dan tingkatkan produktivitas bisnis tanpa ribet coding.
+      </p>
+
+      <!-- Main Navigation Bar (4 Uppercase Tabs) -->
+      <nav class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 border-b border-slate-800/80 pb-3 w-full max-w-2xl mb-6">
+        <button onclick="switchView('home')" id="tab-home" class="nav-tab nav-tab-active text-xs sm:text-sm font-semibold tracking-widest text-slate-300 hover:text-white transition-colors duration-200">
+          BERANDA
+        </button>
+        <button onclick="switchView('resources')" id="tab-resources" class="nav-tab text-xs sm:text-sm font-semibold tracking-widest text-slate-400 hover:text-white transition-colors duration-200">
+          RESOURCES
+        </button>
+        <button onclick="switchView('knowledges')" id="tab-knowledges" class="nav-tab text-xs sm:text-sm font-semibold tracking-widest text-slate-400 hover:text-white transition-colors duration-200">
+          KNOWLEDGES
+        </button>
+        <button onclick="switchView('articles')" id="tab-articles" class="nav-tab text-xs sm:text-sm font-semibold tracking-widest text-slate-400 hover:text-white transition-colors duration-200">
+          ARTICLES
+        </button>
+      </nav>
+
+      <!-- Capsule Shortcut Buttons (Thin outline capsules) -->
+      <div class="flex flex-wrap items-center justify-center gap-2 max-w-3xl mb-8">
+        <button onclick="filterOrJump('AI Content Creator')" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 border border-slate-700/70 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:text-indigo-200 transition-all duration-200">
+          #AI Content Creator
+        </button>
+        <button onclick="filterOrJump('AI Agent Builder')" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 border border-slate-700/70 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:text-indigo-200 transition-all duration-200">
+          #AI Agent Builder
+        </button>
+        <button onclick="filterOrJump('Prompting')" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 border border-slate-700/70 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:text-indigo-200 transition-all duration-200">
+          #Prompt Engineering
+        </button>
+        <button onclick="filterOrJump('Productivity')" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 border border-slate-700/70 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:text-indigo-200 transition-all duration-200">
+          #Productivity & Business
+        </button>
+        <button onclick="filterOrJump('SocialMedia')" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 border border-slate-700/70 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:text-indigo-200 transition-all duration-200">
+          #Social Media Strategy
+        </button>
+      </div>
+
+      <!-- Interactive AI Chat Input Bar (Hero Feature) -->
+      <div class="w-full max-w-2xl">
+        <form onsubmit="handleAIChatSubmit(event)" class="glass-input rounded-2xl p-2 flex items-center gap-2 shadow-xl border border-indigo-500/20">
+          <div class="pl-3 text-indigo-400">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          <input 
+            type="text" 
+            id="ai-query-input" 
+            placeholder="Tanyakan sesuatu tentang materi AI, tools, atau roadmap belajar..." 
+            class="bg-transparent w-full text-sm text-slate-100 placeholder-slate-500 focus:outline-none px-2 py-1.5"
+            required
+          />
+          <button type="submit" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md hover:shadow-indigo-500/25 transition-all">
+            <span>Tanya AI</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </form>
+
+        <!-- Dynamic AI Interactive Assistant Response Container -->
+        <div id="ai-response-box" class="hidden mt-3 p-4 rounded-xl glass-card text-left text-xs sm:text-sm text-slate-300 border border-indigo-500/30 transition-all">
+          <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
+            <div class="flex items-center gap-2 font-medium text-indigo-300">
+              <i data-lucide="bot" class="w-4 h-4 text-purple-400"></i>
+              <span>AI Assistant Creator Labs</span>
+            </div>
+            <button onclick="closeAIResponse()" class="text-slate-500 hover:text-slate-300">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <p id="ai-response-text" class="leading-relaxed text-slate-300"></p>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- MAIN VIEW PANES CONTENT AREA -->
+    <main class="flex-grow py-6">
+      
+      <!-- ==================== HOME VIEW ==================== -->
+      <section id="view-home" class="view-pane active space-y-16">
+        
+        <!-- Section: Problem / Awareness Banner -->
+        <div class="glass-card rounded-3xl p-6 sm:p-10 border border-slate-800 relative overflow-hidden">
+          <div class="max-w-3xl relative z-10 space-y-4">
+            <div class="inline-flex items-center gap-2 text-amber-400 text-xs font-semibold uppercase tracking-wider bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+              <i data-lucide="flame" class="w-3.5 h-3.5"></i>
+              Urgensi Era Digital
+            </div>
+            <h2 class="font-serif text-3xl sm:text-4xl text-white font-normal leading-snug">
+              AI Bukan Lagi Masa Depan. <span class="italic text-indigo-300">AI Sudah Jadi Kebutuhan Hari Ini!</span>
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Pernah merasa kesulitan membuat konten promosi? Bingung mencari ide postingan tiap hari? Atau iri melihat orang lain membuat video AI dan robot otomatisation sementara kamu masih bingung mulai dari mana?
+            </p>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Tenang, kamu tidak sendirian. Di E-Course ini, kamu akan diajak belajar bertahap: dari mengenal prompt, bikin aset visual kreatif, hingga merakit AI Agent otomatis. <strong class="text-slate-200">Nggak harus pintar teknologi. Yang penting mau belajar dan praktik!</strong>
+            </p>
+          </div>
+        </div>
+
+        <!-- Section: What You Will Learn (3 Core Modules) -->
+        <div class="space-y-6">
+          <div class="text-center max-w-2xl mx-auto">
+            <h2 class="font-serif text-3xl sm:text-4xl text-white mb-2">
+              Apa Saja Yang Akan <span class="italic text-indigo-300">Kamu Pelajari?</span>
+            </h2>
+            <p class="text-slate-400 text-xs sm:text-sm">Tiga pilar utama kurikulum belajar yang dirancang khusus untuk pemula hingga tingkat lanjut.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Module 1 -->
+            <div class="glass-card-interactive rounded-2xl p-6 flex flex-col justify-between">
+              <div>
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-5">
+                  <i data-lucide="clapperboard" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">1. AI Content Creator</h3>
+                <p class="text-xs text-slate-400 mb-4 leading-relaxed">Belajar membuat berbagai jenis konten kreatif dengan bantuan AI dalam hitungan menit.</p>
+                
+                <ul class="space-y-2.5 text-xs text-slate-300">
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5"></i>
+                    <span>Mengenal tools AI konten & prompt engineering efektif</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5"></i>
+                    <span>Riset ide konten, caption, & copywriting promosi</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5"></i>
+                    <span>Membuat gambar, desain visual, & video berbasis AI</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5"></i>
+                    <span>Konten untuk Instagram, TikTok, Facebook, & YouTube</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="mt-6 pt-4 border-t border-slate-800">
+                <span class="text-[11px] font-semibold tracking-wider uppercase text-indigo-300">Modul 01 • Praktis</span>
+              </div>
+            </div>
+
+            <!-- Module 2 -->
+            <div class="glass-card-interactive rounded-2xl p-6 flex flex-col justify-between">
+              <div>
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-5">
+                  <i data-lucide="cpu" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">2. AI Agent Builder</h3>
+                <p class="text-xs text-slate-400 mb-4 leading-relaxed">Melangkah lebih jauh untuk membuat AI Agent yang bisa bekerja otomatis untukmu.</p>
+                
+                <ul class="space-y-2.5 text-xs text-slate-300">
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
+                    <span>Konsep AI Agent vs Chatbot konvensional</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
+                    <span>Membuat AI Agent dari dasar tanpa koding rumit</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
+                    <span>Instruksi, sistem prompt, & workflow otomatisasi</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
+                    <span>Otomatisasi tugas bisnis & peningkat produktivitas</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="mt-6 pt-4 border-t border-slate-800">
+                <span class="text-[11px] font-semibold tracking-wider uppercase text-purple-300">Modul 02 • Advanced</span>
+              </div>
+            </div>
+
+            <!-- Module 3 -->
+            <div class="glass-card-interactive rounded-2xl p-6 flex flex-col justify-between">
+              <div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-5">
+                  <i data-lucide="trending-up" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">3. AI Productivity & Business</h3>
+                <p class="text-xs text-slate-400 mb-4 leading-relaxed">Manfaatkan AI untuk efisiensi bisnis, riset cepat, dan peluang income baru.</p>
+                
+                <ul class="space-y-2.5 text-xs text-slate-300">
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                    <span>Riset ide bisnis, produk & strategi pemasaran</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                    <span>Otomatisasi tugas administratif harian</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                    <span>Pengembangan ide layanan & produk berbasis AI</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                    <span>Strategi hemat waktu hingga 10x lebih cepat</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="mt-6 pt-4 border-t border-slate-800">
+                <span class="text-[11px] font-semibold tracking-wider uppercase text-emerald-300">Modul 03 • Strategis</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Who Is This Suitable For? -->
+        <div class="glass-card rounded-3xl p-6 sm:p-10 border border-slate-800">
+          <div class="text-center max-w-xl mx-auto mb-8">
+            <h2 class="font-serif text-3xl sm:text-4xl text-white mb-2">
+              Siapa Yang <span class="italic text-indigo-300">Cocok Ikut Program Ini?</span>
+            </h2>
+            <p class="text-slate-400 text-xs sm:text-sm">Dirancang inclusive agar siapapun bisa bertumbuh cepat.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800 flex items-start gap-3">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <div>
+                <h4 class="text-sm font-semibold text-white">Pemula Total</h4>
+                <p class="text-xs text-slate-400">Ingin belajar AI dari nol tanpa dasar teknis.</p>
+              </div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800 flex items-start gap-3">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <div>
+                <h4 class="text-sm font-semibold text-white">Pelaku UMKM</h4>
+                <p class="text-xs text-slate-400">Membuat materi promosi toko online dengan cepat.</p>
+              </div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800 flex items-start gap-3">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <div>
+                <h4 class="text-sm font-semibold text-white">Content Creator</h4>
+                <p class="text-xs text-slate-400">Ingin produksi ide & media secara praktis.</p>
+              </div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800 flex items-start gap-3">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <div>
+                <h4 class="text-sm font-semibold text-white">Affiliate Marketer</h4>
+                <p class="text-xs text-slate-400">Butuh puluhan ide konten jualan setiap hari.</p>
+              </div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800 flex items-start gap-3">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <div>
+                <h4 class="text-sm font-semibold text-white">Digital Marketer & Freelancer</h4>
+                <p class="text-xs text-slate-400">Menambah nilai jual dan kemampuan baru.</p>
+              </div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800 flex items-start gap-3">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <div>
+                <h4 class="text-sm font-semibold text-white">Karyawan & Mahasiswa</h4>
+                <p class="text-xs text-slate-400">Meningkatkan produktivitas kerja harian.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Why Learn AI Now? (Benefits grid) -->
+        <div class="space-y-6">
+          <div class="text-center max-w-xl mx-auto">
+            <h2 class="font-serif text-3xl sm:text-4xl text-white mb-2">
+              Kenapa Belajar <span class="italic text-indigo-300">AI Sekarang?</span>
+            </h2>
+            <p class="text-slate-400 text-xs sm:text-sm">Bayangkan potensi efisiensi yang bisa kamu dapatkan hari ini.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <div class="glass-card rounded-2xl p-5 space-y-2">
+              <div class="text-indigo-400 font-serif text-2xl font-bold">01</div>
+              <h4 class="text-sm font-semibold text-white">Bikin Ide Konten Tanpa Buntu</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">Tidak perlu pusing lagi memikirkan ide harian. AI siap menyuplai puluhan sudut pandang segar.</p>
+            </div>
+            <div class="glass-card rounded-2xl p-5 space-y-2">
+              <div class="text-indigo-400 font-serif text-2xl font-bold">02</div>
+              <h4 class="text-sm font-semibold text-white">Visual & Video Instan</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">Menghasilkan aset promosi visual dan gambar memukau tanpa keahlian desain profesional.</p>
+            </div>
+            <div class="glass-card rounded-2xl p-5 space-y-2">
+              <div class="text-indigo-400 font-serif text-2xl font-bold">03</div>
+              <h4 class="text-sm font-semibold text-white">Asisten AI Agent 24/7</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">Membangun agen otomatis yang bisa membantu mengelola pekerjaan administratif secara mandiri.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Testimonials -->
+        <div class="space-y-6">
+          <div class="text-center max-w-xl mx-auto">
+            <h2 class="font-serif text-3xl sm:text-4xl text-white mb-2">
+              Apa Kata <span class="italic text-indigo-300">Mereka?</span>
+            </h2>
+            <p class="text-slate-400 text-xs sm:text-sm">Pengalaman peserta yang sudah mempraktikkan materi belajar.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
+              <p class="text-xs text-slate-300 leading-relaxed italic mb-4">
+                "Dulu butuh waktu setengah hari cuma buat bikin 1 konten video & caption. Setelah ikut program ini, dalam 1 jam saya bisa siapin materi promosi untuk seminggu."
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs">
+                  R
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-white">Rizky Pratama</div>
+                  <div class="text-[10px] text-slate-400">UMKM Fashion Owner</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
+              <p class="text-xs text-slate-300 leading-relaxed italic mb-4">
+                "Gak nyangka orang awam coding kayak saya bisa bikin AI Agent sendiri buat bantu riset tren & rekap data bisnis. Materinya runtut banget!"
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
+                  S
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-white">Siti Nurhaliza</div>
+                  <div class="text-[10px] text-slate-400">Digital Freelancer</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
+              <p class="text-xs text-slate-300 leading-relaxed italic mb-4">
+                "Sangat mudah diikuti dari nol. Penjelasan tools dan promptnya sangat aplikatif untuk pekerjaan saya di kantor."
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold text-xs">
+                  B
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-white">Budi Santoso</div>
+                  <div class="text-[10px] text-slate-400">Content Specialist</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Final CTA Banner -->
+        <div class="glass-card rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden border border-indigo-500/30">
+          <div class="relative z-10 max-w-2xl mx-auto space-y-6">
+            <h2 class="font-serif text-4xl sm:text-5xl text-white">
+              Mulai Perjalanan <span class="italic text-indigo-300">AI-Mu Hari Ini!</span>
+            </h2>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Tidak perlu menunggu ahli. Mulai dari satu langkah sederhana. Pelajari satu skill baru, praktikkan, dan kembangkan kemampuanmu sekarang.
+            </p>
+            <div class="pt-2">
+              <button onclick="openRegisterModal()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white font-bold text-sm tracking-wide shadow-lg shadow-indigo-500/30 transition-all transform hover:-translate-y-0.5">
+                KLIK TOMBOL DAFTAR SEKARANG
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== RESOURCES VIEW ==================== -->
+      <section id="view-resources" class="view-pane space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="font-serif text-3xl text-white">Resources & Tools Directory</h2>
+            <p class="text-xs text-slate-400">Kumpulan pustaka skill, prompt template, dan perkakas AI terpilih.</p>
+          </div>
+          <a href="https://www.aihero.dev/skills" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+            <span>Lihat Acuan aihero.dev/skills</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+
+        <!-- Resource Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="resources-grid">
+          <!-- Item 1 -->
+          <div class="glass-card-interactive rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-semibold text-indigo-300 uppercase">Prompting</span>
+                <span class="text-[11px] text-slate-500">Free Starter</span>
+              </div>
+              <h3 class="text-base font-bold text-white mb-2">Master Prompt Generator Cheat-Sheet</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Formula racikan prompt untuk membuat copy promosi, ide konten viral, dan ringkasan buku dalam sekali klik.</p>
+            </div>
+            <a href="https://www.aihero.dev/skills" target="_blank" class="w-full py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-center text-xs font-semibold text-slate-200 transition-colors flex items-center justify-center gap-1.5">
+              <span>Buka Skill Detail</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="glass-card-interactive rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-2.5 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-[10px] font-semibold text-purple-300 uppercase">AI Agent</span>
+                <span class="text-[11px] text-slate-500">Blueprint</span>
+              </div>
+              <h3 class="text-base font-bold text-white mb-2">Autonomous Agent Workflow Template</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Struktur instruksi agent untuk meriset topik trending dan merangkumnya menjadi draft postingan sosial media.</p>
+            </div>
+            <a href="https://www.aihero.dev/skills" target="_blank" class="w-full py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-center text-xs font-semibold text-slate-200 transition-colors flex items-center justify-center gap-1.5">
+              <span>Buka Skill Detail</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="glass-card-interactive rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-2.5 py-1 rounded-md bg-pink-500/10 border border-pink-500/20 text-[10px] font-semibold text-pink-300 uppercase">Visual AI</span>
+                <span class="text-[11px] text-slate-500">Guide</span>
+              </div>
+              <h3 class="text-base font-bold text-white mb-2">Midjourney & Stable Diffusion Style Vault</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Kumpulan parameter gaya fotografi, pencahayaan, dan sinematografi untuk menghasilkan gambar fotorealistis.</p>
+            </div>
+            <a href="https://www.aihero.dev/skills" target="_blank" class="w-full py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-center text-xs font-semibold text-slate-200 transition-colors flex items-center justify-center gap-1.5">
+              <span>Buka Skill Detail</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="glass-card-interactive rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-semibold text-emerald-300 uppercase">Productivity</span>
+                <span class="text-[11px] text-slate-500">Automation</span>
+              </div>
+              <h3 class="text-base font-bold text-white mb-2">Custom GPT Builder Checklist</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Langkah demi langkah menyusun instruksi kustom GPT dan menghubungkan basis pengetahuan (knowledge base).</p>
+            </div>
+            <a href="https://www.aihero.dev/skills" target="_blank" class="w-full py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-center text-xs font-semibold text-slate-200 transition-colors flex items-center justify-center gap-1.5">
+              <span>Buka Skill Detail</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== KNOWLEDGES VIEW ==================== -->
+      <section id="view-knowledges" class="view-pane space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="font-serif text-3xl text-white">Video Knowledges Library</h2>
+            <p class="text-xs text-slate-400">Pustaka modul video pembelajaran interaktif langkah demi langkah.</p>
+          </div>
+          <a href="https://www.aihero.dev/videos" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+            <span>Lihat Acuan aihero.dev/videos</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+
+        <!-- Video Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="knowledges-grid">
+          <!-- Video Item 1 -->
+          <div class="glass-card-interactive rounded-2xl overflow-hidden flex flex-col justify-between group">
+            <div>
+              <div class="relative aspect-video bg-slate-900 overflow-hidden flex items-center justify-center">
+                <!-- Fallback Video Thumbnail Graphic -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-indigo-950 via-slate-900 to-purple-950 opacity-90"></div>
+                <div class="relative z-10 w-12 h-12 rounded-full bg-indigo-600/80 group-hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
+                  <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+                </div>
+                <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-[10px] text-slate-300 font-mono">14:20</span>
+              </div>
+              <div class="p-5">
+                <span class="text-[10px] font-semibold tracking-wider text-indigo-400 uppercase">Dasar AI Content</span>
+                <h3 class="text-base font-bold text-white mt-1 mb-2 group-hover:text-indigo-300 transition-colors">Pengenalan Tools AI & Teknik Dasar Prompting</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">Panduan memilih tools AI yang tepat dan struktur prompt agar hasil teks akurat dan kontekstual.</p>
+              </div>
+            </div>
+            <div class="px-5 pb-5 pt-0">
+              <a href="https://www.aihero.dev/videos" target="_blank" class="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+                <span>Tonton Video</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Video Item 2 -->
+          <div class="glass-card-interactive rounded-2xl overflow-hidden flex flex-col justify-between group">
+            <div>
+              <div class="relative aspect-video bg-slate-900 overflow-hidden flex items-center justify-center">
+                <div class="absolute inset-0 bg-gradient-to-tr from-purple-950 via-slate-900 to-indigo-950 opacity-90"></div>
+                <div class="relative z-10 w-12 h-12 rounded-full bg-purple-600/80 group-hover:bg-purple-500 text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
+                  <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+                </div>
+                <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-[10px] text-slate-300 font-mono">22:45</span>
+              </div>
+              <div class="p-5">
+                <span class="text-[10px] font-semibold tracking-wider text-purple-400 uppercase">AI Agent Setup</span>
+                <h3 class="text-base font-bold text-white mt-1 mb-2 group-hover:text-purple-300 transition-colors">Cara Bikin AI Agent Pertama Tanpa Koding</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">Praktek langsung mengatur instruksi peran, basis data, dan output AI Agent otomatisasi.</p>
+              </div>
+            </div>
+            <div class="px-5 pb-5 pt-0">
+              <a href="https://www.aihero.dev/videos" target="_blank" class="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+                <span>Tonton Video</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Video Item 3 -->
+          <div class="glass-card-interactive rounded-2xl overflow-hidden flex flex-col justify-between group">
+            <div>
+              <div class="relative aspect-video bg-slate-900 overflow-hidden flex items-center justify-center">
+                <div class="absolute inset-0 bg-gradient-to-tr from-emerald-950 via-slate-900 to-indigo-950 opacity-90"></div>
+                <div class="relative z-10 w-12 h-12 rounded-full bg-emerald-600/80 group-hover:bg-emerald-500 text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
+                  <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+                </div>
+                <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-[10px] text-slate-300 font-mono">18:10</span>
+              </div>
+              <div class="p-5">
+                <span class="text-[10px] font-semibold tracking-wider text-emerald-400 uppercase">Produktivitas</span>
+                <h3 class="text-base font-bold text-white mt-1 mb-2 group-hover:text-emerald-300 transition-colors">Otomatisasi Konten Promosi Media Sosial</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">Strategi menghemat waktu 10x lebih cepat dalam produksi materi promosi & copywriting.</p>
+              </div>
+            </div>
+            <div class="px-5 pb-5 pt-0">
+              <a href="https://www.aihero.dev/videos" target="_blank" class="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+                <span>Tonton Video</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== ARTICLES VIEW ==================== -->
+      <section id="view-articles" class="view-pane space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="font-serif text-3xl text-white">Articles & Insights</h2>
+            <p class="text-xs text-slate-400">Artikel mendalam seputar ekosistem AI creator dan strategi lanskap digital.</p>
+          </div>
+          <a href="https://creatorscience.com" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+            <span>Lihat Acuan creatorscience</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+
+        <!-- Tag Filter Pills -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-slate-500 mr-2">Filter Tag:</span>
+          <button onclick="filterArticles('all')" id="tag-all" class="article-tag-btn px-3 py-1 rounded-full text-xs font-semibold bg-indigo-600 text-white border border-indigo-500">
+            Semua Artikel
+          </button>
+          <button onclick="filterArticles('ContentCreator')" id="tag-ContentCreator" class="article-tag-btn px-3 py-1 rounded-full text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 hover:text-white">
+            #ContentCreator
+          </button>
+          <button onclick="filterArticles('AIAgent')" id="tag-AIAgent" class="article-tag-btn px-3 py-1 rounded-full text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 hover:text-white">
+            #AIAgent
+          </button>
+          <button onclick="filterArticles('Productivity')" id="tag-Productivity" class="article-tag-btn px-3 py-1 rounded-full text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 hover:text-white">
+            #Productivity
+          </button>
+          <button onclick="filterArticles('Branding')" id="tag-Branding" class="article-tag-btn px-3 py-1 rounded-full text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 hover:text-white">
+            #Branding
+          </button>
+        </div>
+
+        <!-- Articles Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="articles-grid">
+          <!-- Article 1 -->
+          <article class="article-card glass-card-interactive rounded-2xl p-6 flex flex-col justify-between" data-tag="ContentCreator">
+            <div>
+              <div class="flex items-center gap-2 text-[11px] text-slate-400 mb-3">
+                <span class="text-indigo-400 font-semibold">#ContentCreator</span>
+                <span>•</span>
+                <span>5 Min Read</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2 leading-snug">Bagaimana AI Mengubah Cara Content Creator Bekerja di Tahun Ini</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Analisis mendalam mengapa kreator yang memanfaatkan AI memiliki kecepatan eksekusi 5x lebih cepat dibanding metode konvensional.</p>
+            </div>
+            <a href="https://creatorscience.com" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 font-semibold hover:text-indigo-300">
+              <span>Baca Artikel Lengkap</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </article>
+
+          <!-- Article 2 -->
+          <article class="article-card glass-card-interactive rounded-2xl p-6 flex flex-col justify-between" data-tag="AIAgent">
+            <div>
+              <div class="flex items-center gap-2 text-[11px] text-slate-400 mb-3">
+                <span class="text-purple-400 font-semibold">#AIAgent</span>
+                <span>•</span>
+                <span>8 Min Read</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2 leading-snug">Mengenal Arsitektur AI Agent: Dari LLM ke Autonomous Action</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Penjelasan sederhana mengenai cara kerja AI Agent memahami tugas, memecah langkah kerja, dan mengeksekusi instruksi secara mandiri.</p>
+            </div>
+            <a href="https://creatorscience.com" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 font-semibold hover:text-indigo-300">
+              <span>Baca Artikel Lengkap</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </article>
+
+          <!-- Article 3 -->
+          <article class="article-card glass-card-interactive rounded-2xl p-6 flex flex-col justify-between" data-tag="Productivity">
+            <div>
+              <div class="flex items-center gap-2 text-[11px] text-slate-400 mb-3">
+                <span class="text-emerald-400 font-semibold">#Productivity</span>
+                <span>•</span>
+                <span>4 Min Read</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2 leading-snug">Panduan Hemat Waktu 10 Jam per Minggu dengan Automasi Sederhana</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Trik menyusun alur kerja harian untuk menangani tugas administratif dan penjadwalan tanpa ribet.</p>
+            </div>
+            <a href="https://creatorscience.com" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 font-semibold hover:text-indigo-300">
+              <span>Baca Artikel Lengkap</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </article>
+
+          <!-- Article 4 -->
+          <article class="article-card glass-card-interactive rounded-2xl p-6 flex flex-col justify-between" data-tag="Branding">
+            <div>
+              <div class="flex items-center gap-2 text-[11px] text-slate-400 mb-3">
+                <span class="text-pink-400 font-semibold">#Branding</span>
+                <span>•</span>
+                <span>6 Min Read</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2 leading-snug">Membangun Authentic Personal Brand di Tengah Banjir Konten AI</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Cara menyatukan keunikan karakter personal kamu dengan efisiensi tools AI tanpa kehilangan rasa manusiawi.</p>
+            </div>
+            <a href="https://creatorscience.com" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 font-semibold hover:text-indigo-300">
+              <span>Baca Artikel Lengkap</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </article>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-8 border-t border-slate-800/80 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        © AI Creator Labs. Portal Belajar Eksklusif AI. All rights reserved.
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="https://www.aihero.dev/skills" target="_blank" class="hover:text-slate-300">aihero skills</a>
+        <a href="https://www.aihero.dev/videos" target="_blank" class="hover:text-slate-300">aihero videos</a>
+        <a href="https://creatorscience.com" target="_blank" class="hover:text-slate-300">creator science</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Registration Modal -->
+  <div id="register-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 sm:p-8 border border-indigo-500/30 relative">
+      <button onclick="closeRegisterModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-full bg-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center mb-3">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-serif text-2xl text-white">Gabung E-Course AI Creator</h3>
+        <p class="text-xs text-slate-400 mt-1">Isi data di bawah untuk memulai perjalanan belajar kamu.</p>
+      </div>
+
+      <form onsubmit="handleRegisterSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Lengkap</label>
+          <input type="text" required placeholder="Contoh: Alex Wijaya" class="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Alamat Email</label>
+          <input type="email" required placeholder="nama@email.com" class="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">No. WhatsApp</label>
+          <input type="tel" required placeholder="081234567890" class="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs tracking-wider shadow-lg shadow-indigo-500/20 transition-all mt-2">
+          KONFIRMASI PENDAFTARAN
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Background HTML5 Particle System
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.radius = Math.random() * 1.5 + 0.5;
+        this.alpha = Math.random() * 0.5 + 0.1;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+          this.reset();
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(165, 180, 252, ${this.alpha})`;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = 'rgba(129, 140, 248, 0.5)';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.floor((canvas.width * canvas.height) / 18000);
+      for (let i = 0; i < Math.min(count, 80); i++) {
+        particles.push(new Particle());
+      }
+    }
+    initParticles();
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // Single Page View Switcher Navigation
+    function switchView(viewName) {
+      // Hide all panes
+      document.querySelectorAll('.view-pane').forEach(pane => {
+        pane.classList.remove('active');
+      });
+
+      // Deactivate all nav tabs
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('nav-tab-active');
+        tab.classList.add('text-slate-400');
+        tab.classList.remove('text-white');
+      });
+
+      // Activate selected pane & tab
+      const targetPane = document.getElementById(`view-${viewName}`);
+      const targetTab = document.getElementById(`tab-${viewName}`);
+
+      if (targetPane && targetTab) {
+        targetPane.classList.add('active');
+        targetTab.classList.add('nav-tab-active');
+        targetTab.classList.remove('text-slate-400');
+        targetTab.classList.add('text-white');
+      }
+
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    // Shortcut Capsule Buttons Router & Filter Logic
+    function filterOrJump(tagKey) {
+      if (tagKey === 'AI Content Creator' || tagKey === 'AI Agent Builder') {
+        switchView('home');
+      } else if (tagKey === 'Prompting') {
+        switchView('resources');
+      } else if (tagKey === 'Productivity') {
+        switchView('articles');
+        filterArticles('Productivity');
+      } else if (tagKey === 'SocialMedia') {
+        switchView('knowledges');
+      }
+    }
+
+    // Articles Tag Filtering
+    function filterArticles(tag) {
+      const articles = document.querySelectorAll('.article-card');
+      const tagBtns = document.querySelectorAll('.article-tag-btn');
+
+      // Update button visual styles
+      tagBtns.forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500');
+        btn.classList.add('bg-slate-900', 'text-slate-400', 'border-slate-800');
+      });
+
+      const activeBtn = document.getElementById(`tag-${tag}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-900', 'text-slate-400', 'border-slate-800');
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500');
+      }
+
+      // Filter display
+      articles.forEach(card => {
+        if (tag === 'all' || card.getAttribute('data-tag') === tag) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Interactive AI Response Assistant Simulation
+    function handleAIChatSubmit(e) {
+      e.preventDefault();
+      const queryInput = document.getElementById('ai-query-input');
+      const responseBox = document.getElementById('ai-response-box');
+      const responseText = document.getElementById('ai-response-text');
+
+      const userText = queryInput.value.trim().toLowerCase();
+      if (!userText) return;
+
+      responseBox.classList.remove('hidden');
+      responseText.innerHTML = '<span class="animate-pulse text-indigo-400">Merumuskan jawaban untuk kamu...</span>';
+
+      setTimeout(() => {
+        if (userText.includes('agent') || userText.includes('bot')) {
+          responseText.innerHTML = "<strong>AI Agent Builder:</strong> Di modul ini kamu akan belajar merakit bot otonom yang bisa menjalankan tugas seperti riset otomatis dan pembuatan draft tanpa koding!";
+        } else if (userText.includes('konten') || userText.includes('content') || userText.includes('promosi')) {
+          responseText.innerHTML = "<strong>AI Content Creator:</strong> Kamu bisa belajar membikin ide postingan, copywriting promosi, serta gambar/video AI untuk Instagram, TikTok, dan YouTube.";
+        } else if (userText.includes('pemula') || userText.includes('nol') || userText.includes('coding')) {
+          responseText.innerHTML = "<strong>Ramah Pemula:</strong> E-course ini dirancang 100% tanpa syarat koding atau latar belakang IT. Semua materi diajarkan bertahap dari dasar.";
+        } else {
+          responseText.innerHTML = `Terima kasih! Mengenai "<em>${userText}</em>", kamu dapat menjelajahi kurikulum lengkap di tab <strong>BERANDA</strong> atau materi video di <strong>KNOWLEDGES</strong>.`;
+        }
+      }, 700);
+    }
+
+    function closeAIResponse() {
+      document.getElementById('ai-response-box').classList.add('hidden');
+    }
+
+    // Modal Control Functions
+    function openRegisterModal() {
+      document.getElementById('register-modal').classList.remove('hidden');
+    }
+
+    function closeRegisterModal() {
+      document.getElementById('register-modal').classList.add('hidden');
+    }
+
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      alert("Terima kasih! Pendaftaran kamu telah diterima. Tim AI Creator Labs akan menghubungi via WhatsApp.");
+      closeRegisterModal();
+    }
+  </script>
+</body>
+</html>
