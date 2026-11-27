@@ -2,6 +2,8 @@
   "use strict";
 
   /* ================= DATA ================= */
+  function slug(s) { return s.toLowerCase().replace(/&/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+
   var RESOURCES = [
     { t: "Prompt Pack Konten Instagram", c: "Prompt", d: "Kumpulan prompt siap pakai untuk ide feed, Reels, dan caption yang konsisten.",
       pts: ["30 prompt ide konten per niche", "Format caption dengan hook, isi, dan ajakan", "Cara menyesuaikan gaya bahasa brand"] },
@@ -28,95 +30,95 @@
     { t: "Cheatsheet Prompt Gambar & Video AI", c: "Prompt", d: "Kata kunci visual, gaya, dan komposisi untuk gambar serta video pendek.",
       pts: ["Elemen prompt visual: subjek, gaya, cahaya", "Contoh untuk konten jualan", "Alur membuat video pendek dengan AI"] }
   ];
-  var RES_CATS = ["Semua", "Prompt", "Template", "Panduan", "Tools", "AI Agent"];
+  var RES_CATS = ["Prompt", "Template", "Panduan", "Tools", "AI Agent"];
 
+  // yt: ID video YouTube (11 karakter) → modal embed youtube-nocookie. Kosong = tombol play nonaktif.
+  // thumbnail: URL gambar 16:9 milik sendiri. Kosong = fallback gradient.
   var VIDEOS = [
-    { t: "Mengenal AI dari Nol", dur: "12:40", lvl: "Pemula", h: 235, d: "Gambaran besar AI dan cara memanfaatkannya untuk konten dan pekerjaan sehari-hari.",
+    { t: "Mengenal AI dari Nol", dur: "12:40", lvl: "Pemula", h: 235, yt: "", thumbnail: "", d: "Gambaran besar AI dan cara memanfaatkannya untuk konten dan pekerjaan sehari-hari.",
       pts: ["Apa itu AI dan apa yang bisa dilakukannya", "Mengenal berbagai tools AI", "Langkah pertama yang aman dan praktis"] },
-    { t: "Teknik Prompt yang Efektif", dur: "18:05", lvl: "Pemula", h: 255, d: "Cara menulis perintah agar hasil AI sesuai harapan.",
+    { t: "Teknik Prompt yang Efektif", dur: "18:05", lvl: "Pemula", h: 255, yt: "", thumbnail: "", d: "Cara menulis perintah agar hasil AI sesuai harapan.",
       pts: ["Rumus prompt dasar", "Memperbaiki hasil dengan iterasi", "Contoh prompt untuk konten"] },
-    { t: "Bikin Ide Konten Tanpa Mentok", dur: "14:22", lvl: "Pemula", h: 270, d: "Sistem sederhana untuk punya ide konten setiap hari.",
+    { t: "Bikin Ide Konten Tanpa Mentok", dur: "14:22", lvl: "Pemula", h: 270, yt: "", thumbnail: "", d: "Sistem sederhana untuk punya ide konten setiap hari.",
       pts: ["Menggali ide dari audiens", "Mengubah satu ide jadi banyak format", "Menyusun kalender konten"] },
-    { t: "Caption dan Copywriting Promosi", dur: "16:48", lvl: "Pemula", h: 285, d: "Menulis caption dan materi promosi yang jelas dan menarik dengan bantuan AI.",
+    { t: "Caption dan Copywriting Promosi", dur: "16:48", lvl: "Pemula", h: 285, yt: "", thumbnail: "", d: "Menulis caption dan materi promosi yang jelas dan menarik dengan bantuan AI.",
       pts: ["Struktur copy yang efektif", "Menyesuaikan gaya per platform", "Mengedit hasil AI"] },
-    { t: "Membuat Gambar dan Desain dengan AI", dur: "21:10", lvl: "Menengah", h: 220, d: "Dari prompt visual sampai desain siap unggah, tanpa harus jadi desainer.",
+    { t: "Membuat Gambar dan Desain dengan AI", dur: "21:10", lvl: "Menengah", h: 220, yt: "", thumbnail: "", d: "Dari prompt visual sampai desain siap unggah, tanpa harus jadi desainer.",
       pts: ["Menulis prompt visual", "Menjaga konsistensi gaya", "Mengolah hasil jadi materi promosi"] },
-    { t: "Membuat Video Pendek dengan AI", dur: "24:35", lvl: "Menengah", h: 300, d: "Alur membuat video untuk TikTok, Reels, dan YouTube Shorts.",
+    { t: "Membuat Video Pendek dengan AI", dur: "24:35", lvl: "Menengah", h: 300, yt: "", thumbnail: "", d: "Alur membuat video untuk TikTok, Reels, dan YouTube Shorts.",
       pts: ["Naskah dan storyboard dengan AI", "Menghasilkan visual dan suara", "Menyusun hasil akhir"] },
-    { t: "AI Agent vs Chatbot: Apa Bedanya?", dur: "10:15", lvl: "Pemula", h: 245, d: "Memahami cara kerja AI Agent dan kapan menggunakannya.",
+    { t: "AI Agent vs Chatbot: Apa Bedanya?", dur: "10:15", lvl: "Pemula", h: 245, yt: "", thumbnail: "", d: "Memahami cara kerja AI Agent dan kapan menggunakannya.",
       pts: ["Perbedaan mendasar", "Contoh kasus nyata", "Memilih pendekatan yang tepat"] },
-    { t: "Membangun AI Agent Pertamamu", dur: "28:50", lvl: "Menengah", h: 262, d: "Praktik membuat AI Agent sederhana langkah demi langkah tanpa coding.",
+    { t: "Membangun AI Agent Pertamamu", dur: "28:50", lvl: "Menengah", h: 262, yt: "", thumbnail: "", d: "Praktik membuat AI Agent sederhana langkah demi langkah tanpa coding.",
       pts: ["Menentukan tujuan agen", "Menulis instruksi dan workflow", "Uji coba dan perbaikan"] },
-    { t: "Otomatisasi Kerja untuk Bisnis", dur: "19:30", lvl: "Menengah", h: 210, d: "Memanfaatkan AI Agent untuk pekerjaan bisnis dan produktivitas.",
+    { t: "Otomatisasi Kerja untuk Bisnis", dur: "19:30", lvl: "Menengah", h: 210, yt: "", thumbnail: "", d: "Memanfaatkan AI Agent untuk pekerjaan bisnis dan produktivitas.",
       pts: ["Mencari tugas yang layak diotomatisasi", "Merancang alur kerja", "Menghitung waktu yang dihemat"] }
   ];
-
-  // Isi `src` dengan URL video pendek (mp4) tiap peserta; kosong = tampil placeholder.
-  var SHORTS = [
-    { name: "Nama Peserta", src: "", quote: "[Masukkan pengalaman peserta setelah belajar membuat konten menggunakan AI.]" },
-    { name: "Nama Peserta", src: "", quote: "[Masukkan pengalaman peserta ketika berhasil membuat AI Agent pertamanya.]" },
-    { name: "Nama Peserta", src: "", quote: "[Masukkan pengalaman peserta tentang kemudahan mengikuti materi dari nol.]" }
-  ];
+  var LEVELS = ["Pemula", "Menengah"];
 
   var TAGS = ["Content Creation", "AI Agent", "Produktivitas", "Bisnis & UMKM", "Personal Branding"];
   var ARTICLES = [
-    { g: "Content Creation", t: "5 Cara Menemukan Ide Konten Setiap Hari dengan AI", m: 5, d: "Nov 2026",
+    { g: "Content Creation", t: "5 Cara Menemukan Ide Konten Setiap Hari dengan AI", m: 5, iso: "2026-11-18",
       x: "Bingung mau posting apa? Gunakan AI sebagai partner brainstorming agar ide tidak pernah habis.",
       pts: ["Mulai dari pertanyaan audiens, bukan dari tools", "Minta AI membuat variasi sudut pandang", "Simpan ide terbaik di bank konten"] },
-    { g: "Content Creation", t: "Rumus Caption yang Bikin Orang Berhenti Scroll", m: 4, d: "Nov 2026",
+    { g: "Content Creation", t: "Rumus Caption yang Bikin Orang Berhenti Scroll", m: 4, iso: "2026-11-10",
       x: "Caption bagus punya hook kuat, isi jelas, dan ajakan yang tegas. AI membantumu menyusunnya lebih cepat.",
       pts: ["Tulis 5 versi hook lalu pilih yang terbaik", "Pertahankan suara aslimu saat mengedit", "Akhiri dengan satu ajakan yang jelas"] },
-    { g: "Content Creation", t: "Dari Prompt ke Video: Alur Praktis untuk Pemula", m: 7, d: "Okt 2026",
+    { g: "Content Creation", t: "Dari Prompt ke Video: Alur Praktis untuk Pemula", m: 7, iso: "2026-10-22",
       x: "Video AI tidak harus rumit. Pahami alurnya: naskah, visual, suara, lalu penyuntingan.",
       pts: ["Tulis naskah pendek dan fokus", "Buat visual per adegan", "Rapikan hasil dan tambahkan teks"] },
-    { g: "AI Agent", t: "Apa Itu AI Agent dan Kenapa Kamu Perlu Peduli?", m: 6, d: "Nov 2026",
+    { g: "AI Agent", t: "Apa Itu AI Agent dan Kenapa Kamu Perlu Peduli?", m: 6, iso: "2026-11-15",
       x: "AI Agent bukan sekadar chatbot. Ia bisa menjalankan rangkaian tugas sesuai instruksi dan tujuan yang kamu tetapkan.",
       pts: ["Chatbot menjawab, agen mengerjakan", "Agen butuh tujuan, aturan, dan alur kerja", "Mulai dari tugas kecil yang berulang"] },
-    { g: "AI Agent", t: "Menulis Instruksi AI Agent yang Jelas dan Aman", m: 6, d: "Okt 2026",
+    { g: "AI Agent", t: "Menulis Instruksi AI Agent yang Jelas dan Aman", m: 6, iso: "2026-10-12",
       x: "Kualitas agen ditentukan oleh instruksinya. Susun peran, batasan, dan format hasil dengan rapi.",
       pts: ["Tentukan peran dan tugas utama", "Tulis batasan apa yang tidak boleh dilakukan", "Uji dengan skenario nyata"] },
-    { g: "AI Agent", t: "Tugas Apa Saja yang Cocok Diserahkan ke AI Agent?", m: 5, d: "Sep 2026",
+    { g: "AI Agent", t: "Tugas Apa Saja yang Cocok Diserahkan ke AI Agent?", m: 5, iso: "2026-09-20",
       x: "Tidak semua pekerjaan cocok untuk agen. Cari yang berulang, berpola, dan memakan waktu.",
       pts: ["Ringkasan dan rangkuman", "Draf balasan dan pengingat", "Riset awal dan pengumpulan referensi"] },
-    { g: "Produktivitas", t: "Rutinitas Kerja 30 Menit Lebih Hemat dengan AI", m: 4, d: "Nov 2026",
+    { g: "Produktivitas", t: "Rutinitas Kerja 30 Menit Lebih Hemat dengan AI", m: 4, iso: "2026-11-08",
       x: "Perubahan kecil pada rutinitas harianmu bisa menghemat waktu secara konsisten.",
       pts: ["Delegasikan draf pertama ke AI", "Gunakan template prompt yang sama", "Sisakan waktu untuk review manusia"] },
-    { g: "Produktivitas", t: "Cara Meringkas Dokumen Panjang Tanpa Kehilangan Inti", m: 4, d: "Okt 2026",
+    { g: "Produktivitas", t: "Cara Meringkas Dokumen Panjang Tanpa Kehilangan Inti", m: 4, iso: "2026-10-05",
       x: "Minta AI merangkum dengan format yang kamu butuhkan, lalu cek poin pentingnya sendiri.",
       pts: ["Tentukan tujuan ringkasan", "Minta poin utama dan tindak lanjut", "Verifikasi bagian krusial"] },
-    { g: "Bisnis & UMKM", t: "AI untuk UMKM: Mulai dari Mana?", m: 6, d: "Nov 2026",
+    { g: "Bisnis & UMKM", t: "AI untuk UMKM: Mulai dari Mana?", m: 6, iso: "2026-11-12",
       x: "Pelaku UMKM bisa memakai AI untuk promosi, riset, dan layanan pelanggan tanpa investasi besar.",
       pts: ["Mulai dari konten promosi", "Lanjut ke riset pasar sederhana", "Otomatisasi tugas administratif"] },
-    { g: "Bisnis & UMKM", t: "Membuat Materi Promosi Lebih Cepat untuk Jualan Online", m: 5, d: "Okt 2026",
+    { g: "Bisnis & UMKM", t: "Membuat Materi Promosi Lebih Cepat untuk Jualan Online", m: 5, iso: "2026-10-16",
       x: "Dari deskripsi produk sampai visual iklan, AI mempercepat produksi materi promosi.",
       pts: ["Susun deskripsi produk yang jelas", "Buat variasi iklan untuk diuji", "Jaga konsistensi tampilan brand"] },
-    { g: "Bisnis & UMKM", t: "Menemukan Peluang Layanan Baru Berbasis AI", m: 7, d: "Sep 2026",
+    { g: "Bisnis & UMKM", t: "Menemukan Peluang Layanan Baru Berbasis AI", m: 7, iso: "2026-09-14",
       x: "Riset masalah audiens, lalu rancang layanan yang memanfaatkan AI untuk menyelesaikannya.",
       pts: ["Petakan masalah yang sering muncul", "Uji ide dalam skala kecil", "Ukur hasil dan kembangkan"] },
-    { g: "Personal Branding", t: "Membangun Personal Branding dari Nol dengan AI", m: 6, d: "Nov 2026",
+    { g: "Personal Branding", t: "Membangun Personal Branding dari Nol dengan AI", m: 6, iso: "2026-11-20",
       x: "Personal branding dimulai dari kejelasan: siapa kamu, untuk siapa, dan apa yang kamu tawarkan.",
       pts: ["Rumuskan positioning singkat", "Tentukan 3 pilar konten", "Posting konsisten dengan jadwal realistis"] },
-    { g: "Personal Branding", t: "Tetap Terdengar Seperti Dirimu Saat Memakai AI", m: 5, d: "Okt 2026",
+    { g: "Personal Branding", t: "Tetap Terdengar Seperti Dirimu Saat Memakai AI", m: 5, iso: "2026-10-09",
       x: "AI membantu menulis, tetapi ceritamu tetap harus terasa personal dan autentik.",
       pts: ["Berikan contoh tulisanmu sebagai acuan", "Tambahkan pengalaman pribadi", "Edit sampai terdengar natural"] }
   ];
 
   var CHIPS = [
-    { l: "Prompt konten Instagram", r: "resources", q: "instagram" },
-    { l: "Bikin AI Agent pertama", r: "resources", q: "agent" },
-    { l: "Video AI untuk jualan", r: "knowledges", q: "video" },
-    { l: "Personal branding", r: "articles", tag: "Personal Branding" },
-    { l: "Otomatisasi kerja", r: "articles", tag: "Produktivitas" }
+    { l: "Prompt konten Instagram", href: "#/resources?kategori=prompt" },
+    { l: "Bikin AI Agent pertama", href: "#/resources?kategori=ai-agent" },
+    { l: "Video AI untuk jualan", href: "#/knowledges?q=video" },
+    { l: "Personal branding", href: "#/articles?tag=personal-branding" },
+    { l: "Otomatisasi kerja", href: "#/articles?tag=produktivitas" }
   ];
 
   var PAGES = {
-    resources: { title: "Resources", h: "Kumpulan <em>resource</em> belajar", p: "Prompt, template, dan panduan praktis yang bisa langsung kamu pakai." },
-    knowledges: { title: "Knowledges", h: "Pustaka <em>video</em> pembelajaran", p: "Belajar bertahap lewat video singkat, dari dasar AI sampai membangun AI Agent." },
-    articles: { title: "Articles", h: "Artikel per <em>topik</em>", p: "Pilih satu topik, lalu baca artikel yang relevan untuk kebutuhanmu." }
+    resources: { title: "Resources", h: "Kumpulan <em>resource</em> belajar", p: "Prompt, template, dan panduan praktis yang bisa langsung kamu pakai.",
+      meta: "Kumpulan prompt, template, dan panduan praktis untuk belajar AI dari AI Creator Labs." },
+    knowledges: { title: "Knowledges", h: "Pustaka <em>video</em> pembelajaran", p: "Belajar bertahap lewat video singkat, dari dasar AI sampai membangun AI Agent.",
+      meta: "Pustaka video pembelajaran AI dari dasar sampai membangun AI Agent." },
+    articles: { title: "Articles", h: "Artikel per <em>topik</em>", p: "Pilih satu topik, lalu baca artikel yang relevan untuk kebutuhanmu.",
+      meta: "Artikel belajar AI per topik: content creation, AI Agent, produktivitas, bisnis, dan personal branding." }
   };
+  var HOME_TITLE = "AI Creator Labs — Ruang Belajar AI";
+  var HOME_META = "Ruang belajar AI untuk membuat konten dan membangun AI Agent, tanpa perlu coding. Jelajahi resource, video, dan artikel dari AI Creator Labs.";
 
-  /* ================= STATE & UTIL ================= */
-  var state = { q: "", cat: "Semua", tag: TAGS[0] };
+  /* ================= UTIL ================= */
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -126,91 +128,135 @@
     hay = hay.toLowerCase();
     return tk.reduce(function (n, w) { return n + (hay.indexOf(w) > -1 ? 1 : 0); }, 0);
   }
-  function filterBy(list, hayFn) {
-    if (!state.q.trim()) return list;
+  function search(list, hayFn, q) {
+    if (!q.trim()) return list;
     return list
-      .map(function (it) { return { it: it, s: score(hayFn(it), state.q) }; })
+      .map(function (it) { return { it: it, s: score(hayFn(it), q) }; })
       .filter(function (o) { return o.s > 0; })
       .sort(function (a, b) { return b.s - a.s; })
       .map(function (o) { return o.it; });
   }
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+  function fmtDate(iso) { var p = iso.split("-"); return +p[2] + " " + MONTHS[+p[1] - 1] + " " + p[0]; }
 
-  var ICON_SEARCH = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
-  var ICON_ARROW = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-  var ICON_PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M8 5.5v13l11-6.5z"/></svg>';
+  var ICON_SEARCH = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
+  var ICON_ARROW = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  var ICON_PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
 
-  /* ================= RENDER ================= */
+  /* ================= URL STATE (#/halaman?param=nilai) ================= */
+  function parseHash() {
+    var h = location.hash.replace(/^#/, "");
+    var i = h.indexOf("?");
+    var path = (i > -1 ? h.slice(0, i) : h).replace(/^\/+|\/+$/g, "");
+    return { name: path || "home", params: new URLSearchParams(i > -1 ? h.slice(i + 1) : "") };
+  }
+  function hrefFor(name, params) {
+    var s = params.toString();
+    return "#/" + name + (s ? "?" + s : "");
+  }
+  function chipHref(name, params, key, val) {
+    var p = new URLSearchParams(params.toString());
+    if (val) p.set(key, val); else p.delete(key);
+    return hrefFor(name, p);
+  }
+
+  /* ================= KOMPONEN BERSAMA ================= */
+  // chips: [{ v: nilai param ("" = semua), l: label, n?: jumlah }]
+  function filterBar(name, P, key, chips, active, ph) {
+    var q = P.get("q") || "";
+    var chipHtml = chips.map(function (c) {
+      var on = c.v === active;
+      return '<a class="pill" href="' + esc(chipHref(name, P, key, c.v)) + '"' + (on ? ' aria-current="true"' : "") + '>' + esc(c.l) +
+        (c.n != null ? '<span class="count">' + c.n + '</span>' : "") + '</a>';
+    }).join("");
+    return '<div class="fbar"><div class="fchips" role="group" aria-label="Filter">' + chipHtml + '</div>' +
+      '<label class="search">' + ICON_SEARCH + '<span class="sr">Cari</span><input type="search" data-q placeholder="' + esc(ph) + '" value="' + esc(q) + '" maxlength="80" enterkeyhint="search"></label></div>';
+  }
   function head(key) {
     var p = PAGES[key];
     return '<div class="page-head"><p class="eyebrow"><span class="dot"></span>' + p.title + '</p><h2>' + p.h + '</h2><p>' + p.p + '</p></div>';
   }
-  function searchBox(ph) {
-    return '<label class="search">' + ICON_SEARCH + '<span class="sr">Cari</span><input type="search" data-q placeholder="' + ph + '" value="' + esc(state.q) + '" maxlength="80"></label>';
+  function resultTitle(label, n, noun, q) {
+    return '<h3 class="result-title" aria-live="polite">' + esc(label) + ' · ' + n + ' ' + noun + (q.trim() ? ' · “' + esc(q.trim()) + '”' : "") + '</h3>';
   }
-  function qNote(n) {
-    if (!state.q.trim()) return "";
-    return '<p class="qnote">' + n + ' hasil untuk “' + esc(state.q) + '”<button class="pill" data-clear>Hapus pencarian</button></p>';
-  }
-  function emptyBox() {
-    return '<div class="glass empty"><p>Belum ada yang cocok dengan pencarianmu.</p><button class="pill" data-clear>Tampilkan semua</button></div>';
+  function emptyBox(name, q, label) {
+    var what = q.trim() ? "“" + esc(q.trim()) + "”" : "“" + esc(label) + "”";
+    return '<div class="glass empty"><p>Belum ada hasil untuk ' + what + '.</p><a class="pill" href="#/' + name + '">Reset filter</a></div>';
   }
 
-  function renderResources() {
-    var list = filterBy(RESOURCES, function (r) { return r.t + " " + r.d + " " + r.c; });
-    if (state.cat !== "Semua") list = list.filter(function (r) { return r.c === state.cat; });
-    var filters = RES_CATS.map(function (c) {
-      return '<button class="pill" data-cat="' + esc(c) + '" aria-pressed="' + (state.cat === c) + '">' + esc(c) + '</button>';
-    }).join("");
+  /* ================= RENDER HALAMAN ================= */
+  function renderResources(P) {
+    var kat = P.get("kategori") || "";
+    if (RES_CATS.map(slug).indexOf(kat) < 0) kat = "";
+    var q = P.get("q") || "";
+    var list = search(RESOURCES, function (r) { return r.t + " " + r.d + " " + r.c; }, q);
+    if (kat) list = list.filter(function (r) { return slug(r.c) === kat; });
+    var chips = [{ v: "", l: "Semua" }].concat(RES_CATS.map(function (c) { return { v: slug(c), l: c }; }));
+    var label = kat ? RES_CATS.filter(function (c) { return slug(c) === kat; })[0] : "Semua";
     var cards = list.map(function (r) {
-      return '<button class="glass card" data-open="res" data-i="' + RESOURCES.indexOf(r) + '"><span class="tag">' + esc(r.c) + '</span><h3>' + esc(r.t) + '</h3><p>' + esc(r.d) + '</p><span class="more">Lihat detail ' + ICON_ARROW + '</span></button>';
+      return '<button type="button" class="glass card" data-open="res" data-i="' + RESOURCES.indexOf(r) + '"><span class="tag">' + esc(r.c) + '</span><h3>' + esc(r.t) + '</h3><p>' + esc(r.d) + '</p><span class="more">Lihat detail ' + ICON_ARROW + '</span></button>';
     }).join("");
-    return '<div class="wrap">' + head("resources") +
-      '<div class="toolbar"><div class="filters" role="group" aria-label="Kategori">' + filters + '</div>' + searchBox("Cari resource…") + '</div>' +
-      qNote(list.length) + (list.length ? '<div class="grid">' + cards + '</div>' : emptyBox()) + '</div>';
+    return '<div class="wrap">' + head("resources") + filterBar("resources", P, "kategori", chips, kat, "Cari resource…") +
+      resultTitle(label, list.length, "resource", q) + (list.length ? '<div class="grid">' + cards + "</div>" : emptyBox("resources", q, label)) + "</div>";
   }
 
-  function renderKnowledges() {
-    var list = filterBy(VIDEOS, function (v) { return v.t + " " + v.d + " " + v.lvl + " video"; });
+  function renderKnowledges(P) {
+    var lv = P.get("level") || "";
+    if (LEVELS.map(slug).indexOf(lv) < 0) lv = "";
+    var q = P.get("q") || "";
+    var list = search(VIDEOS, function (v) { return v.t + " " + v.d + " " + v.lvl; }, q);
+    if (lv) list = list.filter(function (v) { return slug(v.lvl) === lv; });
+    var chips = [{ v: "", l: "Semua" }].concat(LEVELS.map(function (c) { return { v: slug(c), l: c }; }));
+    var label = lv ? LEVELS.filter(function (c) { return slug(c) === lv; })[0] : "Semua";
     var cards = list.map(function (v) {
-      return '<button class="glass card" data-open="vid" data-i="' + VIDEOS.indexOf(v) + '">' +
-        '<div class="thumb" style="--h:' + v.h + '"><span class="play">' + ICON_PLAY + '</span><span class="dur">' + v.dur + '</span></div>' +
-        '<span class="tag">' + esc(v.lvl) + '</span><h3>' + esc(v.t) + '</h3><p>' + esc(v.d) + '</p></button>';
+      return '<button type="button" class="glass card" data-open="vid" data-i="' + VIDEOS.indexOf(v) + '" aria-label="' + (v.yt ? "Putar video: " : "Lihat detail video: ") + esc(v.t) + '">' +
+        thumb(v) + '<span class="tag">' + esc(v.lvl) + '</span><h3>' + esc(v.t) + '</h3><p>' + esc(v.d) + '</p></button>';
     }).join("");
-    return '<div class="wrap">' + head("knowledges") +
-      '<div class="toolbar">' + searchBox("Cari video…") + '</div>' +
-      qNote(list.length) + (list.length ? '<div class="grid">' + cards + '</div>' : emptyBox()) + '</div>';
+    return '<div class="wrap">' + head("knowledges") + filterBar("knowledges", P, "level", chips, lv, "Cari video…") +
+      resultTitle(label, list.length, "video", q) + (list.length ? '<div class="grid">' + cards + "</div>" : emptyBox("knowledges", q, label)) + "</div>";
   }
 
-  function renderArticles() {
-    var tagbar = TAGS.map(function (g) {
-      var n = ARTICLES.filter(function (a) { return a.g === g; }).length;
-      return '<button class="pill" data-tag="' + esc(g) + '" aria-pressed="' + (state.tag === g) + '">' + esc(g) + '<span class="count">' + n + '</span></button>';
+  function renderArticles(P) {
+    var tag = P.get("tag") || "";
+    if (TAGS.map(slug).indexOf(tag) < 0) tag = slug(TAGS[0]);
+    var tagName = TAGS.filter(function (g) { return slug(g) === tag; })[0];
+    var q = P.get("q") || "";
+    var chips = TAGS.map(function (g) {
+      return { v: slug(g), l: g, n: ARTICLES.filter(function (a) { return a.g === g; }).length };
+    });
+    var list = search(ARTICLES.filter(function (a) { return a.g === tagName; }), function (a) { return a.t + " " + a.x; }, q);
+    if (!q.trim()) list = list.slice().sort(function (a, b) { return a.iso < b.iso ? 1 : -1; });
+    var rows = list.map(function (a) {
+      return '<button type="button" class="glass row" data-open="art" data-i="' + ARTICLES.indexOf(a) + '"><div class="body"><h3>' + esc(a.t) + '</h3><p>' + esc(a.x) + '</p><p class="meta">' + fmtDate(a.iso) + ' · ' + a.m + ' menit baca</p></div><span class="arrow">' + ICON_ARROW + '</span></button>';
     }).join("");
-    var rows = ARTICLES.map(function (a, i) { return { a: a, i: i }; })
-      .filter(function (o) { return o.a.g === state.tag; })
-      .map(function (o) {
-        return '<button class="glass row" data-open="art" data-i="' + o.i + '"><div class="body"><h3>' + esc(o.a.t) + '</h3><p>' + esc(o.a.x) + '</p><p class="meta">' + esc(o.a.d) + ' · ' + o.a.m + ' menit baca</p></div><span class="arrow">' + ICON_ARROW + '</span></button>';
-      }).join("");
-    return '<div class="wrap">' + head("articles") +
-      '<div class="tagbar" role="group" aria-label="Pilih topik">' + tagbar + '</div>' +
-      '<div class="list">' + rows + '</div></div>';
+    return '<div class="wrap">' + head("articles") + filterBar("articles", P, "tag", chips, tag, "Cari artikel…") +
+      resultTitle(tagName, list.length, "artikel", q) + (list.length ? '<div class="list">' + rows + "</div>" : emptyBox("articles", q, tagName)) + "</div>";
   }
 
   var RENDER = { resources: renderResources, knowledges: renderKnowledges, articles: renderArticles };
 
-  function draw(route, keepFocus) {
-    var el = $('[data-page="' + route + '"]');
+  function thumb(v) {
+    var ready = /^[\w-]{11}$/.test(v.yt);
+    return '<div class="thumb" style="--h:' + v.h + '">' +
+      (v.thumbnail ? '<img src="' + esc(v.thumbnail) + '" alt="" width="640" height="360" loading="lazy" decoding="async">' : "") +
+      '<span class="play' + (ready ? "" : " off") + '">' + ICON_PLAY + '</span>' +
+      (ready ? "" : '<span class="soon">Belum tersedia</span>') +
+      '<span class="dur">' + esc(v.dur) + '</span></div>';
+  }
+
+  function draw(name, keepFocus) {
+    var el = $('[data-page="' + name + '"]');
     var active = document.activeElement;
     var hadSearch = keepFocus && active && active.hasAttribute && active.hasAttribute("data-q");
     var pos = hadSearch ? active.selectionStart : 0;
-    el.innerHTML = RENDER[route]();
+    el.innerHTML = RENDER[name](parseHash().params);
     if (hadSearch) {
       var inp = $("[data-q]", el); inp.focus();
       try { inp.setSelectionRange(pos, pos); } catch (e) {}
     }
   }
 
-  /* ================= DETAIL ================= */
+  /* ================= DETAIL (modal) ================= */
   var dlg = $("#detail"), dbody = $("#detail-body"), lastTrigger = null;
   function list(pts) { return "<ul>" + pts.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul>"; }
   function openDetail(kind, i, trigger) {
@@ -218,29 +264,26 @@
     if (kind === "res") {
       var r = RESOURCES[i];
       h = '<span class="tag">' + esc(r.c) + '</span><h3 id="detail-title">' + esc(r.t) + '</h3><p class="lead">' + esc(r.d) + '</p><h4>Isi resource</h4>' + list(r.pts);
-    } else if (kind === "short") {
-      var s = SHORTS[i];
-      h = (s.src
-        ? '<video class="short" controls playsinline preload="metadata" src="' + esc(s.src) + '"></video>'
-        : '<div class="thumb" style="--h:' + [235, 265, 295][i] + '"><span class="play">' + ICON_PLAY + '</span></div>') +
-        '<h3 id="detail-title">' + esc(s.name) + '</h3><p class="lead">' + esc(s.quote) + '</p>' +
-        (s.src ? "" : '<p class="meta">Video testimoni akan tersedia setelah program berjalan.</p>');
     } else if (kind === "vid") {
-      var v = VIDEOS[i];
-      h = '<div class="thumb" style="--h:' + v.h + '"><span class="play">' + ICON_PLAY + '</span><span class="dur">' + v.dur + '</span></div><h3 id="detail-title">' + esc(v.t) + '</h3><p class="lead">' + esc(v.d) + '</p><h4>Yang kamu pelajari · ' + esc(v.lvl) + '</h4>' + list(v.pts);
+      var v = VIDEOS[i], ready = /^[\w-]{11}$/.test(v.yt);
+      // iframe baru dibuat setelah pengguna mengklik kartu video
+      var media = ready
+        ? '<div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/' + v.yt + '?autoplay=1&rel=0" title="' + esc(v.t) + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
+        : thumb(v);
+      h = media + '<h3 id="detail-title">' + esc(v.t) + '</h3><p class="lead">' + esc(v.d) + '</p><h4>Yang kamu pelajari · ' + esc(v.lvl) + '</h4>' + list(v.pts) +
+        (ready ? "" : '<button type="button" class="btn" disabled>Video belum tersedia</button>');
     } else {
       var a = ARTICLES[i];
       h = '<span class="tag">' + esc(a.g) + '</span><h3 id="detail-title">' + esc(a.t) + '</h3><p class="lead">' + esc(a.x) + '</p><h4>Poin penting · ' + a.m + ' menit baca</h4>' + list(a.pts);
     }
-    dbody.innerHTML = h + '<button class="btn ghost" data-dismiss>Tutup</button>';
+    dbody.innerHTML = h + '<button type="button" class="btn ghost" data-dismiss>Tutup</button>';
     lastTrigger = trigger;
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
     document.documentElement.style.overflow = "hidden";
   }
-  function closeDetail() {
-    if (dlg.close) dlg.close(); else dlg.removeAttribute("open");
-  }
+  function closeDetail() { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
   dlg.addEventListener("close", function () {
+    dbody.innerHTML = ""; // menghentikan dan membuang iframe video
     document.documentElement.style.overflow = "";
     if (lastTrigger && document.contains(lastTrigger)) lastTrigger.focus();
   });
@@ -249,98 +292,71 @@
   });
 
   /* ================= ROUTING ================= */
+  var lastName = null, meta = $('meta[name="description"]');
   function route() {
-    var r = (location.hash.replace(/^#\/?/, "").split("?")[0] || "home");
-    if (r !== "home" && !PAGES[r]) r = "home";
-    document.body.setAttribute("data-route", r);
-    $$(".page").forEach(function (p) { p.hidden = p.getAttribute("data-page") !== r; });
+    var R = parseHash(), name = R.name;
+    var known = name === "home" || !!PAGES[name];
+    var page = known ? name : "notfound";
+    document.body.setAttribute("data-route", page);
+    $$(".page").forEach(function (p) { p.hidden = p.getAttribute("data-page") !== page; });
     $$(".tabs a").forEach(function (a) {
-      if (a.dataset.route === r) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+      if (a.dataset.route === page) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    if (r !== "home") draw(r);
-    document.title = (r === "home" ? "AI Creator Labs — Tempat Belajar AI" : PAGES[r].title + " — AI Creator Labs");
-    window.scrollTo(0, 0);
-    if (route.first) $("#view").focus({ preventScroll: true });
-    route.first = true;
+    Object.keys(RENDER).forEach(function (k) { if (k !== page) $('[data-page="' + k + '"]').innerHTML = ""; });
+    if (RENDER[page]) draw(page);
+    if (page === "home") { document.title = HOME_TITLE; if (meta) meta.content = HOME_META; }
+    else if (page === "notfound") { document.title = "Halaman tidak ditemukan — AI Creator Labs"; }
+    else { document.title = PAGES[page].title + " — AI Creator Labs"; if (meta) meta.content = PAGES[page].meta; }
+    if (lastName !== page) {
+      window.scrollTo(0, 0);
+      if (lastName !== null) $("#view").focus({ preventScroll: true });
+    }
+    lastName = page;
   }
   window.addEventListener("hashchange", route);
 
-  function go(r) {
-    if (location.hash === "#/" + r) route(); else location.hash = "#/" + r;
-  }
-
   /* ================= EVENTS ================= */
   document.addEventListener("click", function (e) {
-    var t = e.target;
-    var open = t.closest("[data-open]");
-    if (open) return openDetail(open.dataset.open, +open.dataset.i, open);
-    var cat = t.closest("[data-cat]");
-    if (cat) { state.cat = cat.dataset.cat; return draw("resources"); }
-    var tag = t.closest("[data-tag]");
-    if (tag) { state.tag = tag.dataset.tag; return draw("articles"); }
-    if (t.closest("[data-clear]")) {
-      state.q = ""; state.cat = "Semua";
-      return draw(document.body.getAttribute("data-route"));
-    }
+    var open = e.target.closest("[data-open]");
+    if (open) openDetail(open.dataset.open, +open.dataset.i, open);
   });
   document.addEventListener("input", function (e) {
-    if (e.target.hasAttribute && e.target.hasAttribute("data-q")) {
-      state.q = e.target.value;
-      draw(document.body.getAttribute("data-route"), true);
-    }
+    if (!e.target.hasAttribute || !e.target.hasAttribute("data-q")) return;
+    var R = parseHash();
+    if (e.target.value.trim()) R.params.set("q", e.target.value); else R.params.delete("q");
+    history.replaceState(null, "", hrefFor(R.name, R.params)); // tidak menambah riwayat Back
+    draw(R.name, true);
   });
 
-  // Chips
-  $("#chips").innerHTML = CHIPS.map(function (c, i) {
-    return '<li><button type="button" data-chip="' + i + '">' + esc(c.l) + '</button></li>';
+  // Chip pintasan (deep link)
+  $("#chips").innerHTML = CHIPS.map(function (c) {
+    return '<li><a href="' + esc(c.href) + '">' + esc(c.l) + '</a></li>';
   }).join("");
-  $("#chips").addEventListener("click", function (e) {
-    var b = e.target.closest("[data-chip]"); if (!b) return;
-    var c = CHIPS[+b.dataset.chip];
-    state.q = c.q || ""; state.cat = "Semua";
-    if (c.tag) state.tag = c.tag;
-    go(c.r);
-  });
 
-  // Input bergaya chat
+  // Input bergaya chat → /resources?q=
   $("#chat").addEventListener("submit", function (e) {
     e.preventDefault();
     var input = $("#chat-input"), q = input.value.trim();
-    state.cat = "Semua";
-    if (!q) { state.q = ""; return go("resources"); }
-    var low = q.toLowerCase(), r = "resources";
-    if (/video|tonton|kelas|belajar lewat/.test(low)) r = "knowledges";
-    else if (/artikel|baca|tips|cara /.test(low)) r = "articles";
-    if (r === "articles") {
-      var best = TAGS.map(function (g) {
-        var s = ARTICLES.filter(function (a) { return a.g === g; }).reduce(function (n, a) { return n + score(a.t + " " + a.x + " " + g, q); }, 0);
-        return { g: g, s: s };
-      }).sort(function (a, b) { return b.s - a.s; })[0];
-      if (best && best.s > 0) state.tag = best.g;
-      state.q = "";
-    } else {
-      state.q = q;
-    }
+    if (!q) return;
     input.value = "";
-    go(r);
+    location.hash = "#/resources?q=" + encodeURIComponent(q);
   });
 
   /* ================= PARTIKEL ================= */
   (function particles() {
     var cv = $("#particles"), ctx = cv.getContext && cv.getContext("2d");
-    if (!ctx) return;
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var W, H, dpr, ps = [], raf = 0;
+    if (!ctx || reduce) { cv.hidden = true; return; }
+    var W, H, ps = [], raf = 0;
     function size() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = cv.clientWidth; H = cv.clientHeight;
       cv.width = W * dpr; cv.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      var n = Math.round(Math.min(70, Math.max(24, W * H / 18000)));
+      var n = Math.max(40, Math.min(60, Math.round(W * H / 20000)));
       ps = [];
       for (var i = 0; i < n; i++) ps.push({
-        x: Math.random() * W, y: Math.random() * H,
-        r: Math.random() * 1.5 + .4,
+        x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.5 + .4,
         vx: (Math.random() - .5) * .12, vy: -(Math.random() * .22 + .04),
         a: Math.random() * .5 + .2, p: Math.random() * 6.28
       });
@@ -352,18 +368,19 @@
         p.x += p.vx; p.y += p.vy;
         if (p.y < -6) { p.y = H + 6; p.x = Math.random() * W; }
         if (p.x < -6) p.x = W + 6; else if (p.x > W + 6) p.x = -6;
-        var tw = reduce ? 1 : .6 + .4 * Math.sin(t / 1200 + p.p);
+        var tw = .6 + .4 * Math.sin(t / 1200 + p.p);
         ctx.beginPath();
         ctx.fillStyle = "rgba(200,205,255," + (p.a * tw).toFixed(3) + ")";
         ctx.shadowColor = "rgba(150,150,255,.8)"; ctx.shadowBlur = 6;
         ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fill();
       }
-      if (!reduce) raf = requestAnimationFrame(frame);
+      raf = requestAnimationFrame(frame);
     }
     function start() { cancelAnimationFrame(raf); size(); raf = requestAnimationFrame(frame); }
     var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(start, 200); });
     document.addEventListener("visibilitychange", function () {
-      if (document.hidden) cancelAnimationFrame(raf); else if (!reduce) raf = requestAnimationFrame(frame);
+      cancelAnimationFrame(raf);
+      if (!document.hidden) raf = requestAnimationFrame(frame);
     });
     start();
   })();
